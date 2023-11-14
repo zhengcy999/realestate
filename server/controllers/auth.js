@@ -134,7 +134,7 @@ export const forgotPassword=async(req,res)=>{
 
       config.AWSSES.sendEmail(
         emailTemplate(email,`
-        <p>Please click the link below to access your account.</p>
+        <p>Please click the link below to access my account.</p>
         <a href="${config.CLIENT_URL}/auth/access-account/${token}">Access my account </a>
         `,config.REPLY_TO,'Access your account'),
       (err, data) => {
@@ -153,7 +153,38 @@ export const forgotPassword=async(req,res)=>{
     console.log(err);
     return res.json({ error: "Something went wrong. Try again." });
   }
+};
+
+export const accessAccount=async(req,res)=>{
+  try{
+   
+    const {resetCode}=jwt.verify(req.body.resetCode,config.JWT_SECRET);
+    const user=await User.findOneAndUpdate({resetCode},{resetCode:""});
+    
+    const token = jwt.sign({ _id: user._id }, config.JWT_SECRET, {
+      expiresIn: "1h",
+    });
+    const refreshToken = jwt.sign({ _id: user._id }, config.JWT_SECRET, {
+      expiresIn: "7d",
+    });
+
+    user.password = undefined;
+    user.resetCode = undefined;
+
+    return res.json({
+      token,
+      refreshToken,
+      user,
+    });
+  
+  }
+  catch (err) {
+    console.log(err);
+    return res.json({ error: "Something went wrong. Try again." });
+  }
+
 }
+
 // export const register = async (req, res) => {
 //   try {
 //     // console.log(req.body);
