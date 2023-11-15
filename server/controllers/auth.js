@@ -77,21 +77,7 @@ export const register = async (req, res) => {
       password: hashedPassword,
     }).save();
 
-    const token = jwt.sign({ _id: user._id }, config.JWT_SECRET, {
-      expiresIn: "1h",
-    });
-    const refreshToken = jwt.sign({ _id: user._id }, config.JWT_SECRET, {
-      expiresIn: "7d",
-    });
-
-    user.password = undefined;
-    user.resetCode = undefined;
-
-    return res.json({
-      token,
-      refreshToken,
-      user,
-    });
+    tokenAndUserResponse(req,res,user);
   } catch (err) {
     console.log(err);
     return res.json({ error: "Something went wrong. Try again." });
@@ -108,9 +94,7 @@ export const login=async(req,res)=>{
     if (!match){
       return res.json({error:"Wrong password"});
     }
-    //3.create jwt tokens
-
-    //4.send the response
+    tokenAndUserResponse(req,res,user);
   }
   catch (err) {
     console.log(err);
@@ -160,23 +144,7 @@ export const accessAccount=async(req,res)=>{
    
     const {resetCode}=jwt.verify(req.body.resetCode,config.JWT_SECRET);
     const user=await User.findOneAndUpdate({resetCode},{resetCode:""});
-    
-    const token = jwt.sign({ _id: user._id }, config.JWT_SECRET, {
-      expiresIn: "1h",
-    });
-    const refreshToken = jwt.sign({ _id: user._id }, config.JWT_SECRET, {
-      expiresIn: "7d",
-    });
-
-    user.password = undefined;
-    user.resetCode = undefined;
-
-    return res.json({
-      token,
-      refreshToken,
-      user,
-    });
-  
+    tokenAndUserResponse(req,res,user);
   }
   catch (err) {
     console.log(err);
@@ -184,25 +152,30 @@ export const accessAccount=async(req,res)=>{
   }
 };
 
+
+const tokenAndUserResponse=(req,res,user)=>{
+  const token = jwt.sign({ _id: user._id }, config.JWT_SECRET, {
+    expiresIn: "1h",
+  });
+  const refreshToken = jwt.sign({ _id: user._id }, config.JWT_SECRET, {
+    expiresIn: "7d",
+  });
+
+  user.password = undefined;
+  user.resetCode = undefined;
+
+  return res.json({
+    token,
+    refreshToken,
+    user,
+  });
+}
+
 export const refreshToken=async(req,res)=>{
   try{
     const {_id}=jwt.verify(req.headers.refresh_token,config.JWT_SECRET);
     const user=await User.findById(_id);
-    const token = jwt.sign({ _id: user._id }, config.JWT_SECRET, {
-      expiresIn: "1h",
-    });
-    const refreshToken = jwt.sign({ _id: user._id }, config.JWT_SECRET, {
-      expiresIn: "7d",
-    });
-
-    user.password = undefined;
-    user.resetCode = undefined;
-
-    return res.json({
-      token,
-      refreshToken,
-      user,
-    });
+    tokenAndUserResponse(req,res,user);
   }
   catch (err) {
     console.log(err);
