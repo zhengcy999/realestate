@@ -1,15 +1,18 @@
-import express  from "express";
+import express from "express";
 
-const router=express.Router();
+const router = express.Router();
 
 import * as auth from "../controllers/auth.js";
+import { requireSignin } from "../middlewares/auth.js";
 
-//GET POST PUT DELETE
-router.get('/',auth.welcome);
-//only by clicking the email to vertify
-router.post('/pre-register',auth.preRegister);
-router.post("/register",auth.register);
-router.post('/login',auth.login);
-router.post('/forgot-password',auth.forgotPassword);
-router.post('/access-account',auth.accessAccount);
+router.get("/", requireSignin, auth.welcome);
+router.post("/pre-register", auth.preRegister);
+router.post("/register", auth.register);
+router.post("/login", auth.login);
+router.post("/forgot-password", auth.forgotPassword);
+router.post("/access-account", auth.accessAccount);
+ router.get("/refresh-token", auth.refreshToken);
+// router.get("/current-user", requireSignin, auth.currentUser);
+// router.get("/profile/:username", auth.publicProfile);
+
 export default router;
