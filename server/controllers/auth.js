@@ -181,6 +181,69 @@ export const refreshToken=async(req,res)=>{
     console.log(err);
     return res.json({ error: "Something went wrong. Try again." });
   }
+};
+
+export const currentUser=async(req,res)=>{
+  try{
+    const user=await User.findById(req.user._id);
+    user.password=undefined;
+    user.resetCode=undefined;
+    res.json(user);
+  }
+  catch (err) {
+    console.log(err);
+    return res.json({ error: "Unauthorized" });
+  }
+};
+
+export const publicProfile=async(req,res)=>{
+  try{
+    const user=await User.findOne({username: req.params.username})
+    user.password=undefined;
+    user.resetCode=undefined;
+    res.json(user);
+  }
+  catch (err) {
+    console.log(err);
+    return res.json({ error: "Unauthorized" });
+  }
+};
+
+export const updatePassword=async(req,res)=>{
+  try{
+    const {password}=req.body;
+    if (!password){
+      return res.json({error:"Unauthorized"});
+    }
+    if (password && password?.length<6){
+      return res.json({error:"Password should be at least 6 characters"});
+    }
+    const user=await User.findByIdAndUpdate(req,user._id,{
+      password:await hashPassword(password),
+    });
+    res.json({ok:true});
+  }
+  catch (err) {
+    console.log(err);
+    return res.json({ error: "Unauthorized" });
+  }
+};
+export const updateProfile=async(req,res)=>{
+  try{
+    const user=await User.findByIdAndUpdate(req.user._id,req.body,{
+      new:true,
+    });
+    user.password=undefined;
+    user.password=undefined;
+    res.json(user);
+  }
+  catch (err) {
+    if (err.codeName==='DuplicateKey'){
+      return res.json({ error: "Username or email is taken" });
+    }else {
+      return res.json({ error: "Unauthorized" });
+    }
+  }
 }
 
 // export const register = async (req, res) => {
