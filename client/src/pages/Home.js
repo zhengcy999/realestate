@@ -1,14 +1,12 @@
 import { useAuth } from "../context/auth";
 
+export default function Home() {
+  const [auth, setAuth] = useAuth();
 
-export default function Home(){
-    const [auth,setAuth]=useAuth();
-    return (
-        <div>
-            <h1 className="display-1 bg-primary text-lgiht p-5">
-                Home
-                <pre>{JSON.stringify(auth,null,4)}</pre>
-            </h1>
-        </div>
-    );
+  return (
+    <div>
+      <h1 className="display-1 bg-primary text-light p-5">Home</h1>
+      <pre>{JSON.stringify(auth, null, 4)}</pre>
+    </div>
+  );
 }
