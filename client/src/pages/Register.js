@@ -1,11 +1,36 @@
-export default function Register(){
+import {useState} from 'react';
+import axios from 'axios';
+import {API} from '../config';
+import toast from "react-hot-toast"
+import { useNavigate } from 'react-router-dom';
 
-    const handleSubmit=async()=>{
+export default function Register(){
+    const [email,setEmail]=useState("");
+    const [password,setPassword]=useState("");
+    const [loading,setLoading]=useState(false);
+
+    const handleSubmit=async(e)=>{
+        e.preventDefault();
         try{
-            //
+            setLoading(true);
+            //console.table({email,password});
+            const {data}=await axios.post(`/pre-register`,{
+                email,password
+            });
+            if (data?.error){
+                toast.error(data.error); 
+                setLoading(false);
+            }else{
+                toast.success('Please check your email to activate account');
+                setLoading(false);
+                Navigate("/");
+            }
+            console.log(data);
         }
         catch(err){
+            setLoading(false);
             console.log(err);
+            toast.success('Something went wrong.');
         }
 
     }
@@ -22,12 +47,19 @@ export default function Register(){
                             <input type="text" placeholder="Enter your email"
                             className="form-control"
                             required
-                            autoFocus />
+                            autoFocus 
+                            value={email}
+                            onChange={(e)=>setEmail(e.target.value)}
+                            />
                             <input type="password" placeholder="Enter your password"
                             className="form-control mb-4"
                             required
-                            autoFocus />
-                          <button className="btn btn-primary col-12 mb-4">Register</button>
+                            autoFocus
+
+                            value={password}
+                            onChange={(e)=>setPassword(e.target.value)}
+                             />
+                          <button disabled={loading} className="btn btn-primary col-12 mb-4">{loading ? "Waiting..." : "Register"}</button>
                           
                         </form>
                     </div>
