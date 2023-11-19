@@ -8,6 +8,7 @@ export default function Register(){
     const [email,setEmail]=useState("");
     const [password,setPassword]=useState("");
     const [loading,setLoading]=useState(false);
+    const navigate=useNavigate();
 
     const handleSubmit=async(e)=>{
         e.preventDefault();
@@ -23,7 +24,7 @@ export default function Register(){
             }else{
                 toast.success('Please check your email to activate account');
                 setLoading(false);
-                Navigate("/");
+                navigate("/");
             }
             console.log(data);
         }
@@ -51,7 +52,8 @@ export default function Register(){
                             value={email}
                             onChange={(e)=>setEmail(e.target.value)}
                             />
-                            <input type="password" placeholder="Enter your password"
+                            <input type="password" 
+                            placeholder="Enter your password"
                             className="form-control mb-4"
                             required
                             autoFocus
